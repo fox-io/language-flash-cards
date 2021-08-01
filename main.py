@@ -6,6 +6,7 @@ language-flash-cards
 import tkinter
 import csv
 import random
+import time
 
 
 class LanguageFlashCards:
@@ -26,7 +27,7 @@ class LanguageFlashCards:
         )
         self.card_front = tkinter.PhotoImage(file="./images/card_front.png")
         self.card_back = tkinter.PhotoImage(file="./images/card_back.png")
-        self.canvas.create_image(800/2, 526/2, image=self.card_front)
+        self.card_image = self.canvas.create_image(800/2, 526/2, image=self.card_front)
         self.language_text = self.canvas.create_text(
             400,
             150,
@@ -64,9 +65,10 @@ class LanguageFlashCards:
         self.language_dict = {}
         self.load_language_cards()
 
+        self.timer = None
         self.current_word_0 = None
         self.current_word_1 = None
-        self.get_random_card()
+        self.get_new_card()
 
         self.FRONT = 0
         self.BACK = 1
@@ -83,23 +85,33 @@ class LanguageFlashCards:
                 else:
                     self.language_dict[row[0]] = row[1]
 
-    def get_random_card(self):
+    def get_new_card(self):
         self.current_word_0 = random.choice(list(self.language_dict.keys()))
         self.current_word_1 = self.language_dict[self.current_word_0]
+        self.start_timer()
 
     def set_word_label(self, side):
         if side == self.FRONT:
             self.canvas.itemconfigure(self.language_text, text=self.language_0)
             self.canvas.itemconfigure(self.word_text, text=self.current_word_0)
+            self.canvas.itemconfigure(self.card_image, image=self.card_front)
         else:
             self.canvas.itemconfigure(self.language_text, text=self.language_1)
             self.canvas.itemconfigure(self.word_text, text=self.current_word_1)
+            self.canvas.itemconfigure(self.card_image, image=self.card_back)
 
     def right_button_onclick(self):
-        self.get_random_card()
+        self.get_new_card()
         self.set_word_label(self.FRONT)
 
     def wrong_button_onclick(self):
+        self.get_new_card()
+        self.set_word_label(self.FRONT)
+
+    def start_timer(self):
+        self.timer = self.window.after(3000, self.ontimer)
+
+    def ontimer(self):
         self.set_word_label(self.BACK)
 
 
