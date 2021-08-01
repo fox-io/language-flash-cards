@@ -44,28 +44,63 @@ class LanguageFlashCards:
         self.canvas.grid(row=0, column=0, columnspan=2)
 
         self.right_image = tkinter.PhotoImage(file="./images/right.png")
-        self.right_button = tkinter.Button(image=self.right_image, highlightthickness=0)
+        self.right_button = tkinter.Button(
+            image=self.right_image,
+            highlightthickness=0,
+            command=self.right_button_onclick
+        )
         self.right_button.grid(column=1, row=1)
 
         self.wrong_image = tkinter.PhotoImage(file="./images/wrong.png")
-        self.wrong_button = tkinter.Button(image=self.wrong_image, highlightthickness=0)
+        self.wrong_button = tkinter.Button(
+            image=self.wrong_image,
+            highlightthickness=0,
+            command=self.wrong_button_onclick
+        )
         self.wrong_button.grid(column=0, row=1)
 
-        self.language = {}
+        self.language_0 = None
+        self.language_1 = None
+        self.language_dict = {}
         self.load_language_cards()
 
+        self.current_word_0 = None
+        self.current_word_1 = None
         self.get_random_card()
+
+        self.FRONT = 0
+        self.BACK = 1
+        self.set_word_label(self.FRONT)
 
     def load_language_cards(self):
         with open("./languages/french_words.csv") as language_file:
             language_data = csv.reader(language_file)
             for row in language_data:
-                # Crude method of skipping the first header row in the csv file.
-                if row[0] != "French":
-                    self.language[row[0]] = row[1]
+                if not self.language_0:
+                    # Save CSV header text for language text on labels.
+                    self.language_0 = row[0]
+                    self.language_1 = row[1]
+                else:
+                    self.language_dict[row[0]] = row[1]
 
     def get_random_card(self):
-        pass
+        self.current_word_0 = random.choice(list(self.language_dict.keys()))
+        self.current_word_1 = self.language_dict[self.current_word_0]
+
+    def set_word_label(self, side):
+        if side == self.FRONT:
+            self.canvas.itemconfigure(self.language_text, text=self.language_0)
+            self.canvas.itemconfigure(self.word_text, text=self.current_word_0)
+        else:
+            self.canvas.itemconfigure(self.language_text, text=self.language_1)
+            self.canvas.itemconfigure(self.word_text, text=self.current_word_1)
+
+    def right_button_onclick(self):
+        self.get_random_card()
+        self.set_word_label(self.FRONT)
+
+    def wrong_button_onclick(self):
+        self.set_word_label(self.BACK)
 
 
 if __name__ == "__main__":
