@@ -4,6 +4,8 @@ language-flash-cards
 (c)2021 John Mann <github.fox-io@foxdata.io>
 """
 import tkinter
+import csv
+import random
 
 
 class LanguageFlashCards:
@@ -48,6 +50,22 @@ class LanguageFlashCards:
         self.wrong_image = tkinter.PhotoImage(file="./images/wrong.png")
         self.wrong_button = tkinter.Button(image=self.wrong_image, highlightthickness=0)
         self.wrong_button.grid(column=0, row=1)
+
+        self.language = {}
+        self.load_language_cards()
+
+        self.get_random_card()
+
+    def load_language_cards(self):
+        with open("./languages/french_words.csv") as language_file:
+            language_data = csv.reader(language_file)
+            for row in language_data:
+                # Crude method of skipping the first header row in the csv file.
+                if row[0] != "French":
+                    self.language[row[0]] = row[1]
+
+    def get_random_card(self):
+        pass
 
 
 if __name__ == "__main__":
