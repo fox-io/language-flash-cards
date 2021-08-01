@@ -6,7 +6,6 @@ language-flash-cards
 import tkinter
 import csv
 import random
-import time
 
 
 class LanguageFlashCards:
