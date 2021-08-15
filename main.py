@@ -94,10 +94,13 @@ class LanguageFlashCards:
             self.canvas.itemconfigure(self.card_image, image=self.card_back)
 
     def right_button_onclick(self):
+        self.window.after_cancel(self.timer)
         self.get_new_card()
         self.set_word_label(self.FRONT)
 
     def wrong_button_onclick(self):
+        self.window.after_cancel(self.timer)
+        self.window.after_cancel(self.window)
         self.get_new_card()
         self.set_word_label(self.FRONT)
 
