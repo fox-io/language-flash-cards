@@ -65,8 +65,7 @@ class LanguageFlashCards:
         self.load_language_cards()
 
         self.timer = None
-        self.current_word_0 = None
-        self.current_word_1 = None
+        self.current_card = None
         self.get_new_card()
 
         self.FRONT = 0
@@ -74,33 +73,39 @@ class LanguageFlashCards:
         self.set_word_label(self.FRONT)
 
     def load_language_cards(self):
-        language_data = pandas.read_csv("./languages/french_words.csv")
+        try:
+            language_data = pandas.read_csv("./data/to_learn.csv")
+        except FileNotFoundError:
+            language_data = pandas.read_csv("./data/french_words.csv")
         self.language_dict = language_data.to_dict(orient='records')
 
+    def remove_card(self):
+        self.language_dict.remove(self.current_card)
+        save_data = pandas.DataFrame(self.language_dict)
+        save_data.to_csv('./data/to_learn.csv')
+
     def get_new_card(self):
-        random_card = random.choice(self.language_dict)
-        self.current_word_0 = random_card["French"]
-        self.current_word_1 = random_card["English"]
+        self.current_card = random.choice(self.language_dict)
         self.start_timer()
 
     def set_word_label(self, side):
         if side == self.FRONT:
             self.canvas.itemconfigure(self.language_text, text="French")
-            self.canvas.itemconfigure(self.word_text, text=self.current_word_0)
+            self.canvas.itemconfigure(self.word_text, text=self.current_card["French"])
             self.canvas.itemconfigure(self.card_image, image=self.card_front)
         else:
             self.canvas.itemconfigure(self.language_text, text="English")
-            self.canvas.itemconfigure(self.word_text, text=self.current_word_1)
+            self.canvas.itemconfigure(self.word_text, text=self.current_card["English"])
             self.canvas.itemconfigure(self.card_image, image=self.card_back)
 
     def right_button_onclick(self):
+        self.remove_card()
         self.window.after_cancel(self.timer)
         self.get_new_card()
         self.set_word_label(self.FRONT)
 
     def wrong_button_onclick(self):
         self.window.after_cancel(self.timer)
-        self.window.after_cancel(self.window)
         self.get_new_card()
         self.set_word_label(self.FRONT)
 
