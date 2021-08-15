@@ -4,8 +4,8 @@ language-flash-cards
 (c)2021 John Mann <github.fox-io@foxdata.io>
 """
 import tkinter
-import csv
 import random
+import pandas
 
 
 class LanguageFlashCards:
@@ -74,28 +74,22 @@ class LanguageFlashCards:
         self.set_word_label(self.FRONT)
 
     def load_language_cards(self):
-        with open("./languages/french_words.csv") as language_file:
-            language_data = csv.reader(language_file)
-            for row in language_data:
-                if not self.language_0:
-                    # Save CSV header text for language text on labels.
-                    self.language_0 = row[0]
-                    self.language_1 = row[1]
-                else:
-                    self.language_dict[row[0]] = row[1]
+        language_data = pandas.read_csv("./languages/french_words.csv")
+        self.language_dict = language_data.to_dict(orient='records')
 
     def get_new_card(self):
-        self.current_word_0 = random.choice(list(self.language_dict.keys()))
-        self.current_word_1 = self.language_dict[self.current_word_0]
+        random_card = random.choice(self.language_dict)
+        self.current_word_0 = random_card["French"]
+        self.current_word_1 = random_card["English"]
         self.start_timer()
 
     def set_word_label(self, side):
         if side == self.FRONT:
-            self.canvas.itemconfigure(self.language_text, text=self.language_0)
+            self.canvas.itemconfigure(self.language_text, text="French")
             self.canvas.itemconfigure(self.word_text, text=self.current_word_0)
             self.canvas.itemconfigure(self.card_image, image=self.card_front)
         else:
-            self.canvas.itemconfigure(self.language_text, text=self.language_1)
+            self.canvas.itemconfigure(self.language_text, text="English")
             self.canvas.itemconfigure(self.word_text, text=self.current_word_1)
             self.canvas.itemconfigure(self.card_image, image=self.card_back)
 
