@@ -82,7 +82,7 @@ class LanguageFlashCards:
     def remove_card(self):
         self.language_dict.remove(self.current_card)
         save_data = pandas.DataFrame(self.language_dict)
-        save_data.to_csv('./data/to_learn.csv')
+        save_data.to_csv('./data/to_learn.csv', index=False)
 
     def get_new_card(self):
         self.current_card = random.choice(self.language_dict)
